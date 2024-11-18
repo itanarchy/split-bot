@@ -1,0 +1,4 @@
+
+ton_connect:
+   manifest_url: https://raw.githubusercontent.com/shibdev/tonconnect-data/refs/heads/main/split.json
+   timeout: 60

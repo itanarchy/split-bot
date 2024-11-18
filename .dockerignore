@@ -1,0 +1,17 @@
+# Project
+.idea/
+.github/
+.*ignore
+README.md
+
+# Cache
+__pycache__/
+*.py[cod]
+
+# Environment
+.env*
+.venv/
+
+# Docker
+docker-compose*.yml
+Dockerfile

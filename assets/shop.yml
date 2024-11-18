@@ -1,0 +1,17 @@
+shop:
+   available_tickers:
+      - USDT
+      - BOLT
+      - NOT
+      - DOGS
+      - SCALE
+
+   min_stars: 50
+   max_stars: 1000000
+   subscription_periods:
+      # month: price in USDT
+      3: 12
+      6: 16
+      12: 29
+
+   stars_price: 0.015

@@ -1,0 +1,31 @@
+# Project
+.idea/
+.vscode/
+.code-workspace
+data/*
+
+# Environment
+.venv/
+.env
+venv/
+docker-compose.yml
+poetry.lock
+uv.lock
+.tests
+
+# Cache
+__pycache__/
+*.py[cod]
+.cache/
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage/
+
+# Build
+build/
+_build/
+dist/
+site/
+*.egg-info/
+*.egg
