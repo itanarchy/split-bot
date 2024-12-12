@@ -22,5 +22,7 @@ class BackendSession(AiohttpSession):
         response: StollenResponse,
     ) -> Any:
         if response.body is not None:
+            if "code" in response.body:
+                response.status_code = response.body["code"]
             response.body["error_message"] = search_error_message(response.body)
         return super().prepare_response(client, request, response)

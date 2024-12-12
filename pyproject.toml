@@ -17,7 +17,7 @@ dependencies = [
     "pydantic-settings[yaml]~=2.6.0",
     "fluent_runtime~=0.4.0",
     "aiogram-contrib>=1.1.2",
-    "stollen>=0.5.6",
+    "stollen>=0.6.0",
     "pytonconnect-fixed==0.3.1",
     "pytoniq-core>=0.1.40",
     "qrcode>=8.0",
