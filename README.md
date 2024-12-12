@@ -2,6 +2,9 @@
 [![Website](https://img.shields.io/badge/Website-split.tg-blue)](https://split.tg)
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-blue)](https://t.me/FishStarsBot)
 [![Telegram](https://img.shields.io/badge/Telegram-Channel-blue)](https://t.me/SplitTg)
+[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
+![Pipeline](https://wpci.itanarchy.app/api/badges/14/status.svg)
+
 # About
 Buy Telegram Stars and Telegram Premium easily with [@FishStarsBot](https://t.me/FishStarsBot)!
 
