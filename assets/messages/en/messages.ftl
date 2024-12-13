@@ -1,4 +1,10 @@
-messages-hello = 👋 Hello, { $name }!
+messages-hello =
+    <b>👋 Hello, { $name }!</b>
+
+    <b>🤩 Ready to buy some stars?</b>
+
+    <b>⚡️ Powered by <a href="https://t.me/SplitTg">Split.tg</a></b>
+
 messages-choose_wallet = 👛 Choose wallet to connect
 messages-ton_connect = 👇 Click the button below or scan QR code to connect your TON wallet
 messages-wallet_connected = 👛 You have successfuly linked your TON wallet { $address }
@@ -50,6 +56,7 @@ messages-referral-invite =
 buttons-menu = 📚 Menu
 buttons-premium = 💠 Premium
 buttons-stars = ⭐️ Stars
+buttons-app = 📱 Open in App
 buttons-referral_program = 🚀 Referral Program
 buttons-copy_link = 🔗 Copy Link
 buttons-disconnect = ⛓️‍💥 Disconnect Wallet

@@ -1,9 +1,10 @@
-from aiogram.types import CopyTextButton, InlineKeyboardMarkup
+from aiogram.types import CopyTextButton, InlineKeyboardMarkup, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram_i18n import I18nContext
 
 from app.enums import PaginationMenuType
 
+from ...const import SITE_URL
 from .callback_data.menu import (
     CDMenu,
     CDPagination,
@@ -22,12 +23,13 @@ def to_menu_keyboard(i18n: I18nContext) -> InlineKeyboardMarkup:
 
 def menu_keyboard(i18n: I18nContext, wallet_connected: bool) -> InlineKeyboardMarkup:
     builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    builder.button(text=i18n.buttons.app(), web_app=WebAppInfo(url=SITE_URL))
     if wallet_connected:
         builder.button(text=i18n.buttons.premium(), callback_data=CDTelegramPremium())
         builder.button(text=i18n.buttons.stars(), callback_data=CDTelegramStars())
         builder.button(text=i18n.buttons.referral_program(), callback_data=CDReferralProgram())
         builder.button(text=i18n.buttons.disconnect(), callback_data=CDUnlinkWallet())
-        builder.adjust(2, 1, 1)
+        builder.adjust(1, 2, 1, 1)
     else:
         builder.button(
             text=i18n.buttons.connect(),

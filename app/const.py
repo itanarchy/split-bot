@@ -10,3 +10,4 @@ ROOT_DIR: Final[Path] = Path(__file__).parent.parent
 ENV_FILE: Final[Path] = ROOT_DIR / ".env"
 ASSETS_SOURCE_DIR: Final[Path] = ROOT_DIR / "assets"
 MESSAGES_SOURCE_DIR: Final[Path] = ASSETS_SOURCE_DIR / "messages"
+SITE_URL: Final[str] = "https://split.tg"
