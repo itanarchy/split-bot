@@ -12,6 +12,13 @@ messages-wallet_not_connected = 👛 Connect your TON wallet to continue
 messages-connection_cancelled = ☑️ Connection cancelled
 messages-connection_timeout = ⏳ Connection expired
 messages-something_went_wrong = Oops! Something went wrong...
+messages-language = 🌎 Select your preferred language by clicking button below:
+
+extra-language = 🇬🇧 🇬English
+extra-selectable = { $selected ->
+    [true] [ {$value} ]
+    *[other] { $value }
+}
 
 messages-purchase-enter_username = Enter username
 messages-purchase-enter_count = Enter stars count
@@ -58,6 +65,7 @@ buttons-premium = 💠 Premium
 buttons-stars = ⭐️ Stars
 buttons-app = 📱 Open in App
 buttons-referral_program = 🚀 Referral Program
+buttons-language = 🌎 Language
 buttons-copy_link = 🔗 Copy Link
 buttons-disconnect = ⛓️‍💥 Disconnect Wallet
 buttons-connect = 🔌 Connect Wallet

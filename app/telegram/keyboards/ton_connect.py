@@ -2,9 +2,9 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram_i18n import I18nContext
 
+from app.enums import PaginationMenuType
 from app.models.dto.ton import TonConnection, TonWallet
 
-from ...enums import PaginationMenuType
 from .callback_data.menu import CDMenu, CDPagination
 from .callback_data.ton_connect import CDCancelConnection, CDChooseWallet
 

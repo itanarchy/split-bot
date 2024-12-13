@@ -14,6 +14,14 @@ class CDTelegramStars(CallbackData, prefix="telegram_stars"):
     pass
 
 
+class CDLanguage(CallbackData, prefix="language"):
+    pass
+
+
+class CDSetLanguage(CallbackData, prefix="set_language"):
+    locale: str
+
+
 class CDReferralProgram(CallbackData, prefix="referral_program"):
     pass
 

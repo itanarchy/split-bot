@@ -12,6 +12,8 @@ messages-wallet_not_connected = 👛 Привяжите ваш TON кошелё�
 messages-connection_cancelled = ☑️ Подключение отменено
 messages-connection_timeout = ⏳ Время подключения истекло
 messages-something_went_wrong = Упс! Что-то пошло не так...
+messages-language = 🌎 Выберите язык, нажав на кнопку ниже:
+extra-language = 🇷🇺 Русский
 
 messages-purchase-enter_username = Введите юзернейм пользователя
 messages-purchase-enter_count = Введите количество звёзд
@@ -61,6 +63,7 @@ buttons-premium = 💠 Premium
 buttons-stars = ⭐️ Stars
 buttons-app = 📱 Открыть в приложении
 buttons-referral_program = 🚀 Реферальная программа
+buttons-language = 🌎 Язык
 buttons-copy_link = 🔗 Скопировать ссылку
 buttons-disconnect = ⛓️‍💥 Отключить кошелёк
 buttons-connect = 🔌 Подключить кошелёк
