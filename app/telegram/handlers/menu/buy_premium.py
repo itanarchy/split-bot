@@ -61,7 +61,7 @@ async def save_username(
     assets: Assets,
 ) -> Any:
     try:
-        recipient: Recipient = await backend.resolve_stars_recipient(
+        recipient: Recipient = await backend.resolve_premium_recipient(
             access_token=user.backend_access_token,
             username=username,
         )
