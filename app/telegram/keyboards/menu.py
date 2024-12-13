@@ -39,7 +39,8 @@ def menu_keyboard(i18n: I18nContext, wallet_connected: bool) -> InlineKeyboardMa
             text=i18n.buttons.connect(),
             callback_data=CDPagination(type=PaginationMenuType.TON_WALLET),
         )
-        builder.adjust(1, 1)
+        builder.button(text=i18n.buttons.language(), callback_data=CDLanguage())
+        builder.adjust(2, 1)
     return builder.as_markup()
 
 

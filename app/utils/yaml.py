@@ -6,7 +6,7 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-from ..const import ASSETS_SOURCE_DIR
+from app.const import ASSETS_SOURCE_DIR
 
 
 class YAMLSettings(BaseSettings):

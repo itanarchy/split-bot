@@ -17,7 +17,8 @@ from aiogram.types import (
 )
 from aiogram_i18n import I18nContext
 
-from ...types import AnyKeyboard
+from app.types import AnyKeyboard
+
 from .exceptions import silent_bot_request
 
 

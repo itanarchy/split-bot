@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from ..const import TIMEZONE
+from app.const import TIMEZONE
 
 
 def datetime_now() -> datetime:
