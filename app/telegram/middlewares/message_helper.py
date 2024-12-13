@@ -4,11 +4,18 @@ from typing import Any, Awaitable, Callable, cast
 
 from aiogram.types import CallbackQuery, ErrorEvent, Message, TelegramObject, Update
 
+from app.enums import MiddlewareEventType
 from app.telegram.helpers.messages import MessageHelper
 from app.telegram.middlewares.event_typed import EventTypedMiddleware
 
 
 class MessageHelperMiddleware(EventTypedMiddleware):
+    __event_types__ = [
+        MiddlewareEventType.MESSAGE,
+        MiddlewareEventType.CALLBACK_QUERY,
+        MiddlewareEventType.ERROR,
+    ]
+
     async def __call__(
         self,
         handler: Callable[[TelegramObject, dict[str, Any]], Awaitable[Any]],

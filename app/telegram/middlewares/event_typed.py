@@ -10,6 +10,7 @@ DEFAULT_UPDATE_TYPES: Final[list[MiddlewareEventType]] = [
     MiddlewareEventType.CALLBACK_QUERY,
     MiddlewareEventType.MY_CHAT_MEMBER,
     MiddlewareEventType.ERROR,
+    MiddlewareEventType.INLINE_QUERY,
 ]
 
 

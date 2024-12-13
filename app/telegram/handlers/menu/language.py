@@ -7,7 +7,7 @@ from aiogram.types import TelegramObject
 from aiogram_i18n import I18nContext
 
 from app.telegram.keyboards.callback_data.menu import CDLanguage, CDSetLanguage
-from app.telegram.keyboards.menu import language_keyboard
+from app.telegram.keyboards.language import language_keyboard
 
 if TYPE_CHECKING:
     from app.telegram.helpers.messages import MessageHelper
