@@ -8,7 +8,6 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_i18n import I18nContext
 from pytonconnect.exceptions import UserRejectsError
 
-from app.services.backend.errors import SplitBadRequestError
 from app.telegram.filters import MagicData
 from app.telegram.filters.states import SGBuyStars
 from app.telegram.keyboards.callback_data.menu import CDTelegramStars
@@ -58,16 +57,10 @@ async def save_stars_recipient(
     user: UserDto,
     backend: Backend,
 ) -> Any:
-    try:
-        recipient: Recipient = await backend.resolve_stars_recipient(
-            access_token=user.backend_access_token,
-            username=username,
-        )
-    except SplitBadRequestError as error:
-        return await helper.edit_current_message(
-            text=error.message,
-            reply_markup=to_menu_keyboard(i18n=i18n),
-        )
+    recipient: Recipient = await backend.resolve_stars_recipient(
+        access_token=user.backend_access_token,
+        username=username,
+    )
     await helper.next_step(
         state=SGBuyStars.enter_count,
         text=i18n.messages.purchase.enter_count(),
@@ -98,7 +91,7 @@ async def save_stars_count(
     await helper.next_step(
         state=SGBuyStars.confirm,
         text=i18n.messages.purchase.confirm(
-            username=data["username"],
+            username=data["username"].removeprefix("@"),
             product=i18n.messages.purchase.stars(count=count),
             price=count * assets.shop.stars_price,
         ),
@@ -118,17 +111,11 @@ async def buy_stars(
     backend: Backend,
 ) -> Any:
     data: dict[str, Any] = await state.get_data()
-    try:
-        transaction: Transaction = await backend.buy_stars(
-            access_token=user.backend_access_token,
-            recipient=data["recipient"],
-            quantity=data["quantity"],
-        )
-    except SplitBadRequestError as error:
-        return await helper.edit_current_message(
-            text=error.message,
-            reply_markup=to_menu_keyboard(i18n=i18n),
-        )
+    transaction: Transaction = await backend.buy_stars(
+        access_token=user.backend_access_token,
+        recipient=data["recipient"],
+        quantity=data["quantity"],
+    )
     await state.clear()
     await helper.answer(
         text=i18n.messages.confirm_transaction(),

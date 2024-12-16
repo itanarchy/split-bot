@@ -20,35 +20,42 @@ extra-selectable = { $selected ->
     *[other] { $value }
 }
 
-messages-purchase-enter_username = Enter username
-messages-purchase-enter_count = Enter stars count
+messages-purchase-enter_username = ✏️ Enter username
+messages-purchase-enter_count = ⭐️ Enter stars count
 messages-purchase-wrong_count =
-    Wrong stars count!
+    <b>❌ Wrong stars count!</b>
 
-    Minimum: { $minimum }
-    Maximum: { $maximum }
+    <b>↘️ Minimum »</b> <code>{ $minimum }</code> ⭐️
+    <b>↗️ Maximum »</b> <code>{ $maximum }</code> ⭐️
 
-    You've entered: { $entered }
+    <b>🔢 Entered »</b> <code>{ $entered }</code> ⭐️
 
-messages-purchase-stars = { $count } stars
+messages-purchase-stars = { $count } ⭐️
 messages-purchase-subscription_period = { $period ->
     [1] 1 month
     [12] 1 year
     *[other] { $period } months
 }
 
-messages-purchase-currency_not_available = Currency is not available
-messages-purchase-subscription_not_available = Subscription is not available
-messages-purchase-premium = Telegram Premium for { messages-purchase-subscription_period }
-messages-purchase-select_period = Select the subscription period
-messages-purchase-select_currency = Select the currency
-messages-purchase-confirm =
-    Username: { $username }
-    Product: { $product }
-    Price: ${ $price }
+messages-purchase-error = { $error ->
+    [already_premium] 😴 @{ $username } already has a premium subscription
+    [username_not_assigned] ⛓️‍💥 Username @{ $username } is not assigned to a user
+    [username_not_found] 🫗 No users found with username @{ $username }
+    *[other] { $error }
+}
 
-messages-confirm_transaction = Confirm transaction in your wallet app to proceed
-messages-transaction_canceled = Transaction canceled
+messages-purchase-currency_not_available = 🫗 Currency is no longer available
+messages-purchase-subscription_not_available = 🫗 Subscription is no longer available
+messages-purchase-premium = Telegram Premium for { messages-purchase-subscription_period }
+messages-purchase-select_period = 📅 Select the subscription period
+messages-purchase-select_currency = 💱 Select the currency
+messages-purchase-confirm =
+    <b>👤 Receiver »</b> @{ $username }
+    <b>🛒 Product »</b> { $product }
+    <b>💸 Price »</b> ${ $price }
+
+messages-confirm_transaction = 👛 Confirm transaction in your wallet app to proceed
+messages-transaction_canceled = ❌ Transaction canceled
 
 messages-referral-info =
     🌟 Invite friends with your referral link and get 40% of their commissions!

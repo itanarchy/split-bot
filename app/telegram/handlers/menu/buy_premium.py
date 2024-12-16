@@ -8,7 +8,6 @@ from aiogram.types import CallbackQuery, Message, TelegramObject
 from aiogram_i18n import I18nContext
 from pytonconnect.exceptions import UserRejectsError
 
-from app.services.backend.errors import SplitBadRequestError
 from app.telegram.filters import MagicData
 from app.telegram.filters.states import SGBuyPremium
 from app.telegram.keyboards.callback_data.menu import CDTelegramPremium
@@ -67,16 +66,10 @@ async def save_premium_recipient(
     backend: Backend,
     assets: Assets,
 ) -> Any:
-    try:
-        recipient: Recipient = await backend.resolve_premium_recipient(
-            access_token=user.backend_access_token,
-            username=username,
-        )
-    except SplitBadRequestError as error:
-        return await helper.edit_current_message(
-            text=error.message,
-            reply_markup=to_menu_keyboard(i18n=i18n),
-        )
+    recipient: Recipient = await backend.resolve_premium_recipient(
+        access_token=user.backend_access_token,
+        username=username,
+    )
     await helper.next_step(
         state=SGBuyPremium.select_period,
         text=i18n.messages.purchase.select_period(),
@@ -111,7 +104,7 @@ async def save_subscription_period(
     await helper.next_step(
         state=SGBuyPremium.confirm,
         text=i18n.messages.purchase.confirm(
-            username=data["username"],
+            username=data["username"].removeprefix("@"),
             product=i18n.messages.purchase.premium(period=period),
             price=assets.shop.subscription_periods[period],
         ),
@@ -131,17 +124,11 @@ async def buy_premium(
     backend: Backend,
 ) -> Any:
     data: dict[str, Any] = await state.get_data()
-    try:
-        transaction: Transaction = await backend.buy_premium(
-            access_token=user.backend_access_token,
-            recipient=data["recipient"],
-            months=data["period"],
-        )
-    except SplitBadRequestError as error:
-        return await helper.edit_current_message(
-            text=error.message,
-            reply_markup=to_menu_keyboard(i18n=i18n),
-        )
+    transaction: Transaction = await backend.buy_premium(
+        access_token=user.backend_access_token,
+        recipient=data["recipient"],
+        months=data["period"],
+    )
     await state.clear()
     await helper.answer(
         text=i18n.messages.confirm_transaction(),

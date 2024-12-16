@@ -15,17 +15,17 @@ messages-something_went_wrong = Упс! Что-то пошло не так...
 messages-language = 🌎 Выберите язык, нажав на кнопку ниже:
 extra-language = 🇷🇺 Русский
 
-messages-purchase-enter_username = Введите юзернейм пользователя
-messages-purchase-enter_count = Введите количество звёзд
+messages-purchase-enter_username = ✏️ Введите юзернейм пользователя
+messages-purchase-enter_count = ⭐️ Введите количество звёзд
 messages-purchase-wrong_count =
-    Неверное количество звёзд!
+    <b>❌ Неверное количество звёзд!</b>
 
-    Минимум: { $minimum }
-    Максимум: { $maximum }
+    <b>↘️ Минимум »</b> <code>{ $minimum }</code> ⭐️
+    <b>↗️ Максимум »</b> <code>{ $maximum }</code> ⭐️
 
-    Вы ввели: { $entered }
+    <b>🔢 Введено »</b> <code>{ $entered }</code> ⭐️
 
-messages-purchase-stars = { $count } звёзд
+messages-purchase-stars = { $count } ⭐️
 messages-purchase-subscription_period = { $period ->
     [one] { $period } месяц
     [few] { $period } месяца
@@ -33,20 +33,27 @@ messages-purchase-subscription_period = { $period ->
     *[other] { $period } месяцев
 }
 
-messages-purchase-currency_not_available = Данная валюта недоступна
-messages-purchase-subscription_not_available = Данная опция недоступна
+messages-purchase-error = { $error ->
+    [already_premium] 😴 У @{ $username } уже есть подписка на Telegram Premium
+    [username_not_assigned] ⛓️‍💥 Ссылка @{ $username } не привязана к пользователю
+    [username_not_found] 🫗 Пользователь @{ $username } не найден
+    *[other] { $error }
+}
+
+messages-purchase-currency_not_available = 🫗 Данная валюта больше не доступна
+messages-purchase-subscription_not_available = 🫗 Данная опция недоступна
 messages-purchase-premium = Telegram Premium на { messages-purchase-subscription_period }
-messages-purchase-select_period = Выберите продолжительность подписки
-messages-purchase-select_currency = Выберите токен для оплаты
+messages-purchase-select_period = 📅 Выберите период подписки
+messages-purchase-select_currency = 💱 Выберите валюту для оплаты
 messages-purchase-confirm =
-    Для пользователя: { $username }
-    Товар: { $product }
-    Цена: ${ $price }
+    <b>👤 Получатель »</b> @{ $username }
+    <b>🛒 Товар »</b> { $product }
+    <b>💸 Цена »</b> ${ $price }
 
 messages-confirm_transaction =
-    Подтвердите транзакцию в приложении вашего кошелька, чтобы продолжить
+    👛 Подтвердите транзакцию в приложении вашего кошелька, чтобы продолжить
 
-messages-transaction_canceled = Транзакция отменена
+messages-transaction_canceled = ❌ Транзакция отменена
 
 messages-referral-info =
     🌟 Приглашай друзей по реферальной ссылке и получай 40% от их комиссий!

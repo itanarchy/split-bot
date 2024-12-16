@@ -1,4 +1,18 @@
+from typing import Any
+
 from stollen.exceptions import StollenAPIError
+
+from app.enums import FragmentErrorType
+
+
+def detect_fragment_error_type(message: str) -> str:
+    if message == "This account is already subscribed to Telegram Premium.":
+        return FragmentErrorType.ALREADY_PREMIUM
+    if message == "Please enter a username assigned to a user.":
+        return FragmentErrorType.USERNAME_NOT_ASSIGNED
+    if message == "No Telegram users found.":
+        return FragmentErrorType.USERNAME_NOT_FOUND
+    return message
 
 
 class SplitAPIError(StollenAPIError):
@@ -6,7 +20,8 @@ class SplitAPIError(StollenAPIError):
 
 
 class SplitBadRequestError(SplitAPIError):
-    pass
+    def __init__(self, message: str, **kwargs: Any) -> None:
+        super().__init__(message=detect_fragment_error_type(message), **kwargs)
 
 
 class SplitUnauthorizedError(SplitAPIError):
