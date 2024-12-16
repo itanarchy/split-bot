@@ -11,3 +11,7 @@ class CDSelectCurrency(CallbackData, prefix="currency"):
 
 class CDConfirmPurchase(CallbackData, prefix="confirm_purchase"):
     pass
+
+
+class CDSelectUsername(CallbackData, prefix="select_username"):
+    username: str

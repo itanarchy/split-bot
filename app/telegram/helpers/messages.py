@@ -1,23 +1,23 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Optional, Union, cast
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Any, Optional, cast
 
 from aiogram import Bot
-from aiogram.client.default import Default
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State
 from aiogram.types import (
     CallbackQuery,
     InaccessibleMessage,
     InlineKeyboardMarkup,
-    LinkPreviewOptions,
     Message,
-    MessageEntity,
 )
 from aiogram_i18n import I18nContext
 
 from app.types import AnyKeyboard
+from app.utils.time import datetime_now
 
 from .exceptions import silent_bot_request
 
@@ -30,6 +30,7 @@ class MessageHelper:
     bot: Bot
     fsm: FSMContext
     i18n: I18nContext
+    last_updated: datetime = field(default_factory=datetime_now)
 
     def copy(
         self,
@@ -47,118 +48,125 @@ class MessageHelper:
             i18n=self.i18n,
         )
 
-    def _resolve_query_message(self) -> tuple[int, Optional[int], bool]:
-        callback_query: Optional[CallbackQuery] = cast(Optional[CallbackQuery], self.update)
-        chat_id: Optional[int] = self.chat_id
-        message_id: Optional[int] = self.message_id
+    def _resolve_message_id(
+        self,
+        chat_id: Optional[int] = None,
+        message_id: Optional[int] = None,
+    ) -> tuple[int, Optional[int], bool]:
+        chat_id = chat_id or self.chat_id
+        message_id = message_id or self.message_id
         can_be_edited: bool = True
-        if callback_query is not None:
-            if callback_query.message is None:
+        if isinstance(self.update, Message):
+            chat_id = chat_id or self.update.chat.id
+            message_id = message_id or self.update.message_id
+            can_be_edited = self.update.from_user.id == self.bot.id  # type: ignore
+        elif isinstance(self.update, CallbackQuery):
+            if self.update.message is None:
                 raise RuntimeError("Message is unavailable.")
             if chat_id is None:
-                chat_id = callback_query.message.chat.id
+                chat_id = self.update.message.chat.id
             if message_id is None:
-                message_id = callback_query.message.message_id
-            if isinstance(callback_query.message, InaccessibleMessage):
+                message_id = self.update.message.message_id
+            if isinstance(self.update.message, InaccessibleMessage):
                 can_be_edited = False
         if chat_id is None:
             raise RuntimeError("Chat is unavailable.")
         return chat_id, message_id, can_be_edited
 
+    async def delete(
+        self,
+        chat_id: Optional[int] = None,
+        message_id: Optional[int] = None,
+    ) -> bool:
+        chat_id, message_id, *_ = self._resolve_message_id(
+            chat_id=chat_id,
+            message_id=message_id,
+        )
+        if message_id is not None:
+            with silent_bot_request():
+                await self.bot.delete_message(chat_id=chat_id, message_id=message_id)
+                return True
+        return False
+
     async def send_new_message(
         self,
         *,
+        chat_id: Optional[int] = None,
+        message_id: Optional[int] = None,
         text: str,
-        parse_mode: Optional[Union[str, Default]] = Default("parse_mode"),
-        entities: Optional[list[MessageEntity]] = None,
-        link_preview_options: Optional[LinkPreviewOptions] = None,
         reply_markup: Optional[AnyKeyboard] = None,
-        disable_web_page_preview: Optional[bool | Default] = Default("link_preview_is_disabled"),
-        request_timeout: Optional[int] = None,
         delete: bool = True,
         **kwargs: Any,
     ) -> Message:
-        chat_id, message_id, *_ = self._resolve_query_message()
-        if delete and message_id is not None:
-            with silent_bot_request():
-                await self.bot.delete_message(chat_id=chat_id, message_id=message_id)
+        chat_id, message_id, *_ = self._resolve_message_id(
+            chat_id=chat_id,
+            message_id=message_id,
+        )
+        if delete:
+            await self.delete(chat_id=chat_id, message_id=message_id)
         return await self.bot.send_message(
             chat_id=chat_id,
             text=text,
-            parse_mode=parse_mode,
-            entities=entities,
-            link_preview_options=link_preview_options,
             reply_markup=reply_markup,
-            disable_web_page_preview=disable_web_page_preview,
-            request_timeout=request_timeout,
             **kwargs,
         )
 
     async def answer(
         self,
         *,
+        chat_id: Optional[int] = None,
+        message_id: Optional[int] = None,
         text: str,
-        inline_message_id: Optional[str] = None,
-        parse_mode: Optional[Union[str, Default]] = Default("parse_mode"),
-        entities: Optional[list[MessageEntity]] = None,
-        link_preview_options: Optional[LinkPreviewOptions] = None,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
-        disable_web_page_preview: Optional[bool | Default] = Default("link_preview_is_disabled"),
-        request_timeout: Optional[int] = None,
         edit: bool = True,
         reply: bool = False,
         delete: bool = True,
+        force_edit: bool = False,
         **kwargs: Any,
     ) -> bool | Message:
-        if isinstance(self.update, Message):
-            if reply:
-                kwargs["reply_to_message_id"] = self.update.message_id
-            return await self.bot.send_message(
-                chat_id=self.chat_id or self.update.chat.id,
+        chat_id, message_id, can_be_edited = self._resolve_message_id(
+            chat_id=chat_id,
+            message_id=message_id,
+        )
+        if force_edit or (edit and can_be_edited and message_id):
+            try:
+                return await self.bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=text,
+                    reply_markup=reply_markup,
+                )
+            except (TelegramBadRequest, TelegramForbiddenError) as error:
+                if "exactly the same as a current content" in str(error):
+                    return self.update if isinstance(self.update, Message) else True
+            finally:
+                self.last_updated = datetime_now()
+
+        if reply and isinstance(self.update, Message):
+            kwargs["reply_to_message_id"] = message_id
+        try:
+            return await self.send_new_message(
+                chat_id=chat_id,
+                message_id=message_id,
                 text=text,
-                parse_mode=parse_mode,
-                entities=entities,
-                link_preview_options=link_preview_options,
                 reply_markup=reply_markup,
-                disable_web_page_preview=disable_web_page_preview,
-                request_timeout=request_timeout,
+                delete=delete,
                 **kwargs,
             )
-        if edit:
-            with silent_bot_request():
-                chat_id, message_id, can_be_edited = self._resolve_query_message()
-                if message_id is not None and can_be_edited:
-                    return await self.bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=message_id,
-                        text=text,
-                        inline_message_id=inline_message_id,
-                        parse_mode=parse_mode,
-                        entities=entities,
-                        link_preview_options=link_preview_options,
-                        reply_markup=reply_markup,
-                        disable_web_page_preview=disable_web_page_preview,
-                        request_timeout=request_timeout,
-                    )
-        return await self.send_new_message(
-            text=text,
-            parse_mode=parse_mode,
-            entities=entities,
-            link_preview_options=link_preview_options,
-            reply_markup=reply_markup,
-            disable_web_page_preview=disable_web_page_preview,
-            request_timeout=request_timeout,
-            delete=delete,
-            **kwargs,
-        )
+        finally:
+            self.last_updated = datetime_now()
 
     async def edit_current_message(
         self,
         *,
         text: str,
         reply_markup: Optional[InlineKeyboardMarkup] = None,
+        fsm_data: Optional[dict[str, Any]] = None,
         **kwargs: Any,
     ) -> tuple[Message, dict[str, Any]]:
+        if fsm_data is None:
+            fsm_data = await self.fsm.get_data()
+
         if isinstance(self.update, CallbackQuery):
             message: Message = cast(Message, self.update.message)
         else:
@@ -166,20 +174,24 @@ class MessageHelper:
             with silent_bot_request():
                 await message.delete()
 
-        data: dict[str, Any] = await self.fsm.get_data()
-        return (
-            cast(
-                Message,
-                await self.bot.edit_message_text(
-                    chat_id=message.chat.id,
-                    message_id=data["message_id"],
-                    text=text,
-                    reply_markup=reply_markup,
-                    **kwargs,
-                ),
+        message_id: int = fsm_data.setdefault("message_id", message.message_id)
+        message = cast(
+            Message,
+            await self.answer(
+                chat_id=message.chat.id,
+                message_id=message_id,
+                text=text,
+                reply_markup=reply_markup,
+                force_edit=True,
+                **kwargs,
             ),
-            data,
         )
+
+        if message.message_id != message_id:
+            fsm_data["message_id"] = message.message_id
+            await self.fsm.set_data(fsm_data)
+
+        return message, fsm_data
 
     async def next_step(
         self,

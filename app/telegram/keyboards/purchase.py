@@ -1,3 +1,5 @@
+from typing import Optional
+
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram_i18n import I18nContext
@@ -9,7 +11,22 @@ from app.telegram.keyboards.callback_data.purchase import (
     CDConfirmPurchase,
     CDSelectCurrency,
     CDSelectSubscriptionPeriod,
+    CDSelectUsername,
 )
+
+
+def enter_username_keyboard(
+    i18n: I18nContext, username: Optional[str] = None
+) -> InlineKeyboardMarkup:
+    builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    if username is not None:
+        builder.button(
+            text=i18n.buttons.select_username(username=username),
+            callback_data=CDSelectUsername(username=username),
+        )
+    builder.button(text=i18n.buttons.menu(), callback_data=CDMenu())
+    builder.adjust(1, repeat=True)
+    return builder.as_markup()
 
 
 def subscription_period_keyboard(i18n: I18nContext, assets: Assets) -> InlineKeyboardMarkup:

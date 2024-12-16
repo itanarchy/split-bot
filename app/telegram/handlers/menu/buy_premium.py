@@ -15,10 +15,12 @@ from app.telegram.keyboards.callback_data.menu import CDTelegramPremium
 from app.telegram.keyboards.callback_data.purchase import (
     CDConfirmPurchase,
     CDSelectSubscriptionPeriod,
+    CDSelectUsername,
 )
 from app.telegram.keyboards.menu import to_menu_keyboard
 from app.telegram.keyboards.purchase import (
     confirm_purchase_keyboard,
+    enter_username_keyboard,
     subscription_period_keyboard,
 )
 from app.telegram.middlewares import TonConnectCheckerMiddleware
@@ -37,7 +39,7 @@ TonConnectCheckerMiddleware().setup_inner(router)
 
 @router.callback_query(CDTelegramPremium.filter())
 async def proceed_premium_purchase(
-    _: TelegramObject,
+    query: CallbackQuery,
     helper: MessageHelper,
     i18n: I18nContext,
     state: FSMContext,
@@ -45,14 +47,19 @@ async def proceed_premium_purchase(
     await state.set_state(SGBuyPremium.enter_username)
     message: Message = await helper.answer(  # type: ignore[assignment]
         text=i18n.messages.purchase.enter_username(),
-        reply_markup=to_menu_keyboard(i18n=i18n),
+        reply_markup=enter_username_keyboard(i18n=i18n, username=query.from_user.username),
     )
     await state.set_data({"message_id": message.message_id})
 
 
 @router.message(SGBuyPremium.enter_username, F.text.as_("username"))
-async def save_username(
-    _: Message,
+@router.callback_query(
+    SGBuyPremium.enter_username,
+    CDSelectUsername.filter(),
+    MagicData(F.callback_data.username.as_("username")),
+)
+async def save_premium_recipient(
+    _: TelegramObject,
     helper: MessageHelper,
     username: str,
     i18n: I18nContext,

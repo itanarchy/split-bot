@@ -4,16 +4,17 @@ from typing import TYPE_CHECKING, Any, Final
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message, TelegramObject
+from aiogram.types import CallbackQuery, Message
 from aiogram_i18n import I18nContext
 from pytonconnect.exceptions import UserRejectsError
 
 from app.services.backend.errors import SplitBadRequestError
+from app.telegram.filters import MagicData
 from app.telegram.filters.states import SGBuyStars
 from app.telegram.keyboards.callback_data.menu import CDTelegramStars
-from app.telegram.keyboards.callback_data.purchase import CDConfirmPurchase
+from app.telegram.keyboards.callback_data.purchase import CDConfirmPurchase, CDSelectUsername
 from app.telegram.keyboards.menu import to_menu_keyboard
-from app.telegram.keyboards.purchase import confirm_purchase_keyboard
+from app.telegram.keyboards.purchase import confirm_purchase_keyboard, enter_username_keyboard
 from app.telegram.middlewares import TonConnectCheckerMiddleware
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ TonConnectCheckerMiddleware().setup_inner(router)
 
 @router.callback_query(CDTelegramStars.filter())
 async def proceed_stars_purchase(
-    _: TelegramObject,
+    query: CallbackQuery,
     helper: MessageHelper,
     i18n: I18nContext,
     state: FSMContext,
@@ -38,13 +39,18 @@ async def proceed_stars_purchase(
     await state.set_state(SGBuyStars.enter_username)
     message: Message = await helper.answer(  # type: ignore[assignment]
         text=i18n.messages.purchase.enter_username(),
-        reply_markup=to_menu_keyboard(i18n=i18n),
+        reply_markup=enter_username_keyboard(i18n=i18n, username=query.from_user.username),
     )
     await state.set_data({"message_id": message.message_id})
 
 
 @router.message(SGBuyStars.enter_username, F.text.as_("username"))
-async def save_username(
+@router.callback_query(
+    SGBuyStars.enter_username,
+    CDSelectUsername.filter(),
+    MagicData(F.callback_data.username.as_("username")),
+)
+async def save_stars_recipient(
     _: Message,
     helper: MessageHelper,
     username: str,

@@ -61,6 +61,7 @@ messages-referral-invite =
 buttons-menu = 📚 Меню
 buttons-premium = 💠 Premium
 buttons-stars = ⭐️ Stars
+buttons-select_username = 👤 @{ $username } (Я)
 buttons-app = 📱 Открыть в приложении
 buttons-referral_program = 🚀 Реферальная программа
 buttons-language = 🌎 Язык
