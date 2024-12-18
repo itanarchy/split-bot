@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Final, Optional, cast
+from typing import TYPE_CHECKING, Any, Final, cast
 
 from aiogram import F, Router
 from aiogram.filters import ExceptionTypeFilter, StateFilter, or_f
@@ -12,7 +12,6 @@ from app.exceptions.base import BotError
 from app.models.dto import UserDto
 from app.services.backend.errors import SplitBadRequestError, SplitUnauthorizedError
 from app.services.user import UserService
-from app.telegram.filters import MagicData
 from app.telegram.filters.states import SGBuyPremium, SGBuyStars
 from app.telegram.keyboards.callback_data.purchase import CDSelectUsername
 from app.telegram.keyboards.menu import to_menu_keyboard
