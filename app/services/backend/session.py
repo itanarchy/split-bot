@@ -1,4 +1,4 @@
-from typing import Any, cast
+from typing import Any, Optional, cast
 
 from stollen import Stollen
 from stollen.requests import StollenRequest, StollenResponse
