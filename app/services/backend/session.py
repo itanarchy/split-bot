@@ -5,12 +5,12 @@ from stollen.requests import StollenRequest, StollenResponse
 from stollen.session.aiohttp import AiohttpSession
 
 
-def search_error_message(body: dict[str, Any]) -> str:
+def search_error_message(body: dict[str, Any]) -> Optional[str]:
     if "detail" in body:
         if isinstance(body["detail"], str):
             return cast(str, body.pop("detail"))
         body = body.pop("detail")
-    return cast(str, body["error_message"])
+    return cast(Optional[str], body.get("error_message"))
 
 
 class BackendSession(AiohttpSession):
