@@ -2,22 +2,26 @@ from typing import Any, Awaitable, Callable, Optional, cast
 
 from aiogram.types import User as AiogramUser
 from aiogram_i18n.cores import BaseCore
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.models.config import AppConfig
 from app.models.dto import UserDto
 from app.models.sql import User
-from app.services.database import RedisRepository
-from app.services.database.postgres import UsersRepository
+from app.services.database import RedisRepository, SQLSessionContext
 
 
 class UserService:
+    session_pool: async_sessionmaker[AsyncSession]
+    redis: RedisRepository
+    config: AppConfig
+
     def __init__(
         self,
-        repository: UsersRepository,
+        session_pool: async_sessionmaker[AsyncSession],
         redis: RedisRepository,
         config: AppConfig,
     ) -> None:
-        self.repository = repository
+        self.session_pool = session_pool
         self.redis = redis
         self.config = config
 
@@ -27,17 +31,18 @@ class UserService:
         i18n_core: BaseCore[Any],
         inviter: Optional[str] = None,
     ) -> UserDto:
-        user: User = User(
-            telegram_id=aiogram_user.id,
-            name=aiogram_user.full_name,
-            locale=(
-                aiogram_user.language_code
-                if aiogram_user.language_code in i18n_core.locales
-                else cast(str, i18n_core.default_locale)
-            ),
-            inviter=inviter,
-        )
-        await self.repository.uow.commit(user)
+        async with SQLSessionContext(self.session_pool) as (repository, uow):
+            user: User = User(
+                telegram_id=aiogram_user.id,
+                name=aiogram_user.full_name,
+                locale=(
+                    aiogram_user.language_code
+                    if aiogram_user.language_code in i18n_core.locales
+                    else cast(str, i18n_core.default_locale)
+                ),
+                inviter=inviter,
+            )
+            await uow.commit(user)
         return user.dto()
 
     async def _get(
@@ -59,18 +64,22 @@ class UserService:
         return user_dto
 
     async def get(self, user_id: int) -> Optional[UserDto]:
-        return await self._get(self.repository.get, user_id)
+        async with SQLSessionContext(self.session_pool) as (repository, uow):
+            return await self._get(repository.users.get, user_id)
 
     async def by_tg_id(self, telegram_id: int) -> Optional[UserDto]:
-        return await self._get(self.repository.by_tg_id, telegram_id)
+        async with SQLSessionContext(self.session_pool) as (repository, uow):
+            return await self._get(repository.users.by_tg_id, telegram_id)
 
     async def by_address(self, wallet_address: str) -> Optional[UserDto]:
-        return await self._get(self.repository.by_address, wallet_address)
+        async with SQLSessionContext(self.session_pool) as (repository, uow):
+            return await self._get(repository.users.by_address, wallet_address)
 
     async def update(self, user: UserDto, **kwargs: Any) -> None:
         for key, value in kwargs.items():
             setattr(user, key, value)
-        await self.repository.update(user_id=user.id, **user.model_state)
+        async with SQLSessionContext(self.session_pool) as (repository, uow):
+            await repository.users.update(user_id=user.id, **user.model_state)
         await self.redis.save_user(
             key=user.telegram_id,
             value=user,

@@ -16,7 +16,6 @@ from app.utils.logging import database as logger
 
 if TYPE_CHECKING:
     from app.models.dto import UserDto
-    from app.services.database import Repository
 
 
 class UserMiddleware(EventTypedMiddleware):
@@ -48,9 +47,8 @@ class UserMiddleware(EventTypedMiddleware):
             # when accepting chat_join_request and receiving chat_member updates.
             return await handler(event, data)
 
-        repository: Repository = data["repository"]
         user_service = data["user_service"] = UserService(
-            repository=repository.users,
+            session_pool=data["session_pool"],
             redis=data["redis"],
             config=data["config"],
         )

@@ -21,7 +21,6 @@ from app.telegram.handlers import admin, extra, menu, ton_connect
 from app.telegram.helpers.paginator import Paginator
 from app.telegram.keyboards.callback_data.menu import CDPagination
 from app.telegram.middlewares import (
-    DBSessionMiddleware,
     MessageHelperMiddleware,
     TonConnectMiddleware,
     UserMiddleware,
@@ -72,7 +71,6 @@ def create_dispatcher(config: AppConfig) -> Dispatcher:
     dispatcher.message.filter(F.chat.type == ChatType.PRIVATE)
     dispatcher.callback_query.filter(F.message.chat.type == ChatType.PRIVATE)
 
-    DBSessionMiddleware().setup_inner(router=dispatcher)
     UserMiddleware().setup_inner(router=dispatcher)
     setup_i18n_middleware(dispatcher=dispatcher, config=config)
     MessageHelperMiddleware().setup_inner(router=dispatcher)
