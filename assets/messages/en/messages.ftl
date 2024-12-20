@@ -9,6 +9,7 @@ messages-choose_wallet = 👛 Choose wallet to connect
 messages-ton_connect = 👇 Click the button below or scan QR code to connect your TON wallet
 messages-wallet_connected = 👛 You have successfuly linked your TON wallet { $address }
 messages-wallet_not_connected = 👛 Connect your TON wallet to continue
+messages-session_expired = ⏳ Your session has expired. Please reconnect your TON wallet again
 messages-connection_cancelled = ☑️ Connection cancelled
 messages-connection_timeout = ⏳ Connection expired
 messages-something_went_wrong = Oops! Something went wrong...

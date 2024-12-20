@@ -40,7 +40,7 @@ async def expire_session(
 ) -> Any:
     await logout_user(user=user, user_service=user_service, ton_connect=ton_connect)
     return await helper.edit_current_message(
-        text=i18n.messages.wallet_not_connected(),
+        text=i18n.messages.session_expired(),
         reply_markup=connect_wallet_keyboard(i18n=i18n),
     )
 
