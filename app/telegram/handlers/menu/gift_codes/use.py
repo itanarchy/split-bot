@@ -67,7 +67,7 @@ async def search_gift_code(
             toncenter=toncenter,
         )
     except ClientResponseError as error:
-        if error.code == 401:
+        if error.status == 401:
             return await show_main_menu(
                 _=_,
                 helper=helper,
