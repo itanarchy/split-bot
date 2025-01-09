@@ -1,14 +1,23 @@
+from typing import Literal
+
+from pydantic import Field
+
 from ..types import TonProof
-from .base import PublicSplitMethod
+from .base import SplitMethod
 
 
 class CheckTonProof(
-    PublicSplitMethod[str],
+    SplitMethod[str],
     api_method="/ton-proof/check_proof",
     returning=str,
-    response_data_key=["token"],
+    response_data_key=["message", "token"],
 ):
-    address: str
-    network: str
-    public_key: str
-    proof: TonProof
+    address: str = Field(description="Wallet address")
+    network: Literal["-3", "-239"] = Field(
+        description=(
+            "Wallet masterchain ID represented represented as a string.\n"
+            "-239 for the main network, -3 for the test network."
+        )
+    )
+    public_key: str = Field(description="Wallet public key")
+    proof: TonProof = Field(description="Wallet proof data")

@@ -9,6 +9,6 @@ class GetMe(
     http_method=HTTPMethod.GET,
     api_method="/user/get",
     returning=User,
-    response_data_key=["user"],
+    response_data_key=["message", "user"],
 ):
     pass

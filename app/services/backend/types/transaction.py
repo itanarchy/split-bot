@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import Field
 
 from .base import SplitObject
@@ -7,11 +5,9 @@ from .transaction_message import TransactionMessage
 
 
 class Transaction(SplitObject):
-    valid_until: Optional[int] = Field(
-        default=None,
+    messages: list[TransactionMessage] = Field(description="List of transaction messages")
+    valid_until: int = Field(
+        description="Transaction valid until timestamp",
         validation_alias="validUntil",
         serialization_alias="valid_until",
     )
-    from_address: Optional[str] = Field(default=None, alias="from")
-    network: Optional[int] = Field(default=None, alias="network")
-    messages: list[TransactionMessage]

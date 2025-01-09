@@ -1,0 +1,6 @@
+
+gift_codes:
+   min_activations: 1
+   max_activations: 100
+   min_amount: 0.5
+   max_amount: 100

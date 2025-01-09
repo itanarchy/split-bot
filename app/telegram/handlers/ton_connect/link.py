@@ -24,7 +24,7 @@ from app.utils.ton import short_address
 
 if TYPE_CHECKING:
     from app.models.config import Assets
-    from app.models.dto.ton import TonConnection, TonConnectResult
+    from app.models.dto import TonConnection, TonConnectResult
     from app.services.task_manager import TaskManager
     from app.services.ton_connect import TcAdapter
     from app.services.user import UserService

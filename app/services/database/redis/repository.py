@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from typing import Any, Optional, TypeVar
+from uuid import UUID
 
 from pydantic import BaseModel, TypeAdapter
 from redis.asyncio import Redis
 from redis.typing import ExpiryT
 
-from app.models.dto import UserDto
+from app.models.dto import DeepLinkDto, UserDto
 from app.utils import mjson
 from app.utils.key_builder import StorageKey
 
-from .keys import TcRecordKey, UserKey
+from .keys import DeepLinkKey, TcRecordKey, UserKey
 
 T = TypeVar("T", bound=Any)
 
@@ -55,17 +56,19 @@ class RedisRepository:
         return None
 
     async def delete_tc_record(self, telegram_id: int, key: str) -> None:
-        tc_record_key: TcRecordKey = TcRecordKey(telegram_id=telegram_id, key=key)
-        await self.delete(tc_record_key)
+        await self.delete(key=TcRecordKey(telegram_id=telegram_id, key=key))
 
     async def save_user(self, key: Any, value: UserDto, cache_time: int) -> None:
-        user_key: UserKey = UserKey(key=str(key))
-        await self.set(key=user_key, value=value, ex=cache_time)
+        await self.set(key=UserKey(key=str(key)), value=value, ex=cache_time)
 
     async def get_user(self, key: Any) -> Optional[UserDto]:
-        user_key: UserKey = UserKey(key=str(key))
-        return await self.get(key=user_key, validator=UserDto)
+        return await self.get(key=UserKey(key=str(key)), validator=UserDto)
 
     async def delete_user(self, key: Any) -> None:
-        user_key: UserKey = UserKey(key=str(key))
-        await self.delete(user_key)
+        await self.delete(key=UserKey(key=str(key)))
+
+    async def save_deep_link(self, link: DeepLinkDto, cache_time: int) -> None:
+        await self.set(key=DeepLinkKey(id=link.id), value=link, ex=cache_time)
+
+    async def get_deep_link(self, link_id: UUID) -> Optional[DeepLinkDto]:
+        return await self.get(key=DeepLinkKey(id=link_id), validator=DeepLinkDto)

@@ -7,7 +7,7 @@ from pytonconnect import TonConnect
 from pytonconnect.exceptions import WalletNotConnectedError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from app.models.dto.ton import TonWallet
+from app.models.dto import TonWallet
 
 from ..backend.types import Transaction
 from ..database import RedisRepository
@@ -73,7 +73,7 @@ class TcAdapter:
         )
 
     async def send_transaction(self, transaction: Transaction) -> dict[str, Any]:
-        data: dict[str, Any] = transaction.model_dump(exclude_defaults=False)
+        data: dict[str, Any] = transaction.model_dump(exclude_defaults=True)
         return cast(
             dict[str, Any],
             await self.connector.send_transaction(transaction=data),

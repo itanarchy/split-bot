@@ -16,7 +16,8 @@ from app.telegram.keyboards.callback_data.purchase import (
 
 
 def enter_username_keyboard(
-    i18n: I18nContext, username: Optional[str] = None
+    i18n: I18nContext,
+    username: Optional[str] = None,
 ) -> InlineKeyboardMarkup:
     builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
     if username is not None:

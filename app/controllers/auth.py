@@ -1,7 +1,6 @@
 from typing import Optional
 
-from app.models.dto import UserDto
-from app.models.dto.ton import TonConnectResult
+from app.models.dto import TonConnectResult, UserDto
 from app.services.backend import Backend
 from app.services.backend.errors import SplitConflictError
 from app.services.backend.types import User as SplitUser
@@ -23,21 +22,17 @@ async def authorize_user(
             user_service=user_service,
             ton_connect=ton_connect.copy(telegram_id=by_address.telegram_id),
         )
-
+    backend.access_token = result.access_token
     user.wallet_address = result.address
     old_token: Optional[str] = user.backend_access_token
     if old_token != result.access_token:
         user.backend_access_token = result.access_token
         try:
-            split_user: SplitUser = await backend.create_user(
-                access_token=result.access_token,
-                inviter=user.inviter,
-            )
+            split_user: SplitUser = await backend.create_user(inviter=user.inviter)
         except SplitConflictError:
-            split_user = await backend.get_me(access_token=result.access_token)
+            split_user = await backend.get_me()
         user.backend_user_id = split_user.id
         user.inviter = split_user.inviter
-
     await user_service.update(user=user)
 
 

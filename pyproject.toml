@@ -22,6 +22,7 @@ dependencies = [
     "pytoniq-core>=0.1.40",
     "qrcode>=8.0",
     "pillow>=11.0.0",
+    "tonutils>=0.1.8",
 ]
 
 [tool.uv]

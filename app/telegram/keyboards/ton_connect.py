@@ -3,7 +3,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram_i18n import I18nContext
 
 from app.enums import PaginationMenuType
-from app.models.dto.ton import TonConnection, TonWallet
+from app.models.dto import TonConnection, TonWallet
 
 from .callback_data.menu import CDMenu, CDPagination
 from .callback_data.ton_connect import CDCancelConnection, CDChooseWallet

@@ -49,7 +49,7 @@ messages-purchase-select_currency = 💱 Выберите валюту для о
 messages-purchase-confirm =
     <b>👤 Получатель »</b> @{ $username }
     <b>🛒 Товар »</b> { $product }
-    <b>💸 Цена »</b> ${ $price }
+    <b>💸 Цена »</b> { $ton_price } TON (~${ $usd_price })
 
 messages-confirm_transaction =
     👛 Подтвердите транзакцию в приложении вашего кошелька, чтобы продолжить
@@ -71,7 +71,7 @@ buttons-premium = 💠 Premium
 buttons-stars = ⭐️ Stars
 buttons-select_username = 👤 @{ $username } (Я)
 buttons-app = 📱 Открыть в приложении
-buttons-referral_program = 🚀 Реферальная программа
+buttons-referral_program = 🚀 Реф. программа
 buttons-language = 🌎 Язык
 buttons-copy_link = 🔗 Скопировать ссылку
 buttons-share = 👥 Поделиться
@@ -79,6 +79,7 @@ buttons-join_bot = 💝️ Покупай Stars через Split.tg
 buttons-disconnect = ⛓️‍💥 Отключить кошелёк
 buttons-connect = 🔌 Подключить кошелёк
 buttons-back = 🔙 Назад
-buttons-cancel = ❌ Отмена
+buttons-cancel = 🚫 Отмена
 buttons-ton_connect_url = 📱 Перейти к приложению
 buttons-confirm = ✅ Всё верно
+buttons-create = 🚀 Создать

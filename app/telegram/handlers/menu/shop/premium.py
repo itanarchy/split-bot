@@ -8,6 +8,7 @@ from aiogram.types import CallbackQuery, Message, TelegramObject
 from aiogram_i18n import I18nContext
 from pytonconnect.exceptions import UserRejectsError
 
+from app.controllers.price import PriceDto, get_premium_price
 from app.telegram.filters import MagicData
 from app.telegram.filters.states import SGBuyPremium
 from app.telegram.keyboards.callback_data.menu import CDTelegramPremium
@@ -26,7 +27,6 @@ from app.telegram.middlewares import TonConnectCheckerMiddleware
 
 if TYPE_CHECKING:
     from app.models.config import Assets
-    from app.models.dto import UserDto
     from app.services.backend import Backend
     from app.services.backend.types import Recipient, Transaction
     from app.services.ton_connect import TcAdapter
@@ -62,14 +62,10 @@ async def save_premium_recipient(
     helper: MessageHelper,
     username: str,
     i18n: I18nContext,
-    user: UserDto,
     backend: Backend,
     assets: Assets,
 ) -> Any:
-    recipient: Recipient = await backend.resolve_premium_recipient(
-        access_token=user.backend_access_token,
-        username=username,
-    )
+    recipient: Recipient = await backend.resolve_premium_recipient(username=username)
     await helper.next_step(
         state=SGBuyPremium.select_period,
         text=i18n.messages.purchase.select_period(),
@@ -90,6 +86,7 @@ async def save_subscription_period(
     state: FSMContext,
     period: int,
     i18n: I18nContext,
+    backend: Backend,
     assets: Assets,
 ) -> Any:
     if period not in assets.shop.subscription_periods:
@@ -99,6 +96,7 @@ async def save_subscription_period(
             reply_markup=subscription_period_keyboard(i18n=i18n, assets=assets),
         )
 
+    price: PriceDto = await get_premium_price(months=period, backend=backend, assets=assets)
     await query.answer()
     data: dict[str, Any] = await state.get_data()
     await helper.next_step(
@@ -106,7 +104,8 @@ async def save_subscription_period(
         text=i18n.messages.purchase.confirm(
             username=data["username"].removeprefix("@"),
             product=i18n.messages.purchase.premium(period=period),
-            price=assets.shop.subscription_periods[period],
+            usd_price=price.usd_price,
+            ton_price=price.ton_price,
         ),
         reply_markup=confirm_purchase_keyboard(i18n=i18n),
         update={"period": period},
@@ -120,12 +119,10 @@ async def buy_premium(
     i18n: I18nContext,
     state: FSMContext,
     ton_connect: TcAdapter,
-    user: UserDto,
     backend: Backend,
 ) -> Any:
     data: dict[str, Any] = await state.get_data()
     transaction: Transaction = await backend.buy_premium(
-        access_token=user.backend_access_token,
         recipient=data["recipient"],
         months=data["period"],
     )
@@ -137,4 +134,7 @@ async def buy_premium(
     try:
         await ton_connect.send_transaction(transaction)
     except UserRejectsError:
-        await helper.answer(text=i18n.messages.transaction_canceled())
+        await helper.answer(
+            text=i18n.messages.transaction_canceled(),
+            reply_markup=to_menu_keyboard(i18n=i18n),
+        )

@@ -40,8 +40,8 @@ messages-purchase-subscription_period = { $period ->
 
 messages-purchase-error = { $error ->
     [already_premium] 😴 @{ $username } already has a premium subscription
-    [username_not_assigned] ⛓️‍💥 Username @{ $username } is not assigned to a user
-    [username_not_found] 🫗 No users found with username @{ $username }
+    [username_not_assigned] ⛓️‍💥 Username @{ $username } is not assigned to a user. Maybe you should try again?
+    [username_not_found] 🫗 No users found with username @{ $username }. Maybe you should try again?
     *[other] { $error }
 }
 
@@ -53,7 +53,7 @@ messages-purchase-select_currency = 💱 Select the currency
 messages-purchase-confirm =
     <b>👤 Receiver »</b> @{ $username }
     <b>🛒 Product »</b> { $product }
-    <b>💸 Price »</b> ${ $price }
+    <b>💸 Price »</b> { $ton_price } TON (~${ $usd_price })
 
 messages-confirm_transaction = 👛 Confirm transaction in your wallet app to proceed
 messages-transaction_canceled = ❌ Transaction canceled
@@ -81,6 +81,7 @@ buttons-join_bot = 💝️ Buy Stars via Split.tg
 buttons-disconnect = ⛓️‍💥 Disconnect Wallet
 buttons-connect = 🔌 Connect Wallet
 buttons-back = 🔙 Back
-buttons-cancel = ❌ Cancel
+buttons-cancel = 🚫 Cancel
 buttons-ton_connect_url = 📱 Go to the app
 buttons-confirm = ✅ Everything is correct
+buttons-create = 🚀 Create

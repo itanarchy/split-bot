@@ -12,7 +12,7 @@ from app.exceptions.base import BotError
 from app.models.dto import UserDto
 from app.services.backend.errors import SplitBadRequestError, SplitUnauthorizedError
 from app.services.user import UserService
-from app.telegram.filters.states import SGBuyPremium, SGBuyStars
+from app.telegram.filters.states import SGBuyPremium, SGBuyStars, SGUseGiftCode
 from app.telegram.keyboards.callback_data.purchase import CDSelectUsername
 from app.telegram.keyboards.menu import to_menu_keyboard
 from app.telegram.keyboards.ton_connect import connect_wallet_keyboard
@@ -47,7 +47,7 @@ async def expire_session(
 
 @router.error(
     ExceptionTypeFilter(SplitBadRequestError),
-    StateFilter(SGBuyPremium(), SGBuyStars()),
+    StateFilter(SGBuyPremium(), SGBuyStars(), SGUseGiftCode()),
     or_f(
         F.update.event.text.as_("username"),
         F.update.event.data.func(CDSelectUsername.unpack).username.as_("username"),

@@ -3,7 +3,9 @@ from __future__ import annotations
 from sqlalchemy import Index
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .base import Base, Int64
+from app.utils.custom_types import Int64
+
+from .base import Base
 from .mixins.timestamp import TimestampMixin
 
 

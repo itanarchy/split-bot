@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from app.models.dto.ton import TonConnection
+from app.models.dto import TonConnection
 from app.services.backend import Backend
 
 if TYPE_CHECKING:
-    from app.models.dto.ton import TonWallet
+    from app.models.dto import TonWallet
     from app.services.ton_connect import TcAdapter
 
 

@@ -8,6 +8,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram_i18n import I18nContext
 from pytonconnect.exceptions import UserRejectsError
 
+from app.controllers.price import PriceDto, get_stars_price
 from app.telegram.filters import MagicData
 from app.telegram.filters.states import SGBuyStars
 from app.telegram.keyboards.callback_data.menu import CDTelegramStars
@@ -18,7 +19,6 @@ from app.telegram.middlewares import TonConnectCheckerMiddleware
 
 if TYPE_CHECKING:
     from app.models.config import Assets
-    from app.models.dto import UserDto
     from app.services.backend import Backend
     from app.services.backend.types import Recipient, Transaction
     from app.services.ton_connect import TcAdapter
@@ -54,13 +54,9 @@ async def save_stars_recipient(
     helper: MessageHelper,
     username: str,
     i18n: I18nContext,
-    user: UserDto,
     backend: Backend,
 ) -> Any:
-    recipient: Recipient = await backend.resolve_stars_recipient(
-        access_token=user.backend_access_token,
-        username=username,
-    )
+    recipient: Recipient = await backend.resolve_stars_recipient(username=username)
     await helper.next_step(
         state=SGBuyStars.enter_count,
         text=i18n.messages.purchase.enter_count(),
@@ -69,34 +65,37 @@ async def save_stars_recipient(
     )
 
 
-@router.message(SGBuyStars.enter_count, F.text.cast(int).as_("count"))
+@router.message(SGBuyStars.enter_count, F.text.cast(int).as_("quantity"))
 async def save_stars_count(
     _: Message,
     helper: MessageHelper,
     state: FSMContext,
-    count: int,
+    quantity: int,
     i18n: I18nContext,
+    backend: Backend,
     assets: Assets,
 ) -> Any:
-    if count < assets.shop.min_stars or count > assets.shop.max_stars:
+    if quantity < assets.shop.min_stars or quantity > assets.shop.max_stars:
         return await helper.edit_current_message(
             text=i18n.messages.purchase.wrong_count(
                 minimum=assets.shop.min_stars,
                 maximum=assets.shop.max_stars,
-                entered=count,
+                entered=quantity,
             ),
             reply_markup=to_menu_keyboard(i18n=i18n),
         )
     data: dict[str, Any] = await state.get_data()
+    price: PriceDto = await get_stars_price(quantity=quantity, backend=backend, assets=assets)
     await helper.next_step(
         state=SGBuyStars.confirm,
         text=i18n.messages.purchase.confirm(
             username=data["username"].removeprefix("@"),
-            product=i18n.messages.purchase.stars(count=count),
-            price=count * assets.shop.stars_price,
+            product=i18n.messages.purchase.stars(count=quantity),
+            usd_price=price.usd_price,
+            ton_price=price.ton_price,
         ),
         reply_markup=confirm_purchase_keyboard(i18n=i18n),
-        update={"quantity": count},
+        update={"quantity": quantity},
     )
 
 
@@ -107,12 +106,10 @@ async def buy_stars(
     i18n: I18nContext,
     state: FSMContext,
     ton_connect: TcAdapter,
-    user: UserDto,
     backend: Backend,
 ) -> Any:
     data: dict[str, Any] = await state.get_data()
     transaction: Transaction = await backend.buy_stars(
-        access_token=user.backend_access_token,
         recipient=data["recipient"],
         quantity=data["quantity"],
     )
@@ -124,4 +121,7 @@ async def buy_stars(
     try:
         await ton_connect.send_transaction(transaction)
     except UserRejectsError:
-        await helper.answer(text=i18n.messages.transaction_canceled())
+        await helper.answer(
+            text=i18n.messages.transaction_canceled(),
+            reply_markup=to_menu_keyboard(i18n=i18n),
+        )

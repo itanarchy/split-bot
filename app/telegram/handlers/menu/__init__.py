@@ -2,13 +2,13 @@ from typing import Final
 
 from aiogram import Router
 
-from . import buy_premium, buy_stars, language, main, referral_program
+from . import gift_codes, language, main, referral_program, shop
 
 router: Final[Router] = Router(name=__name__)
 router.include_routers(
+    gift_codes.router,
     main.router,
-    buy_premium.router,
-    buy_stars.router,
+    shop.router,
     language.router,
     referral_program.router,
 )

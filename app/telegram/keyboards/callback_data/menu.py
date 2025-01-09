@@ -1,5 +1,8 @@
 from aiogram.contrib.paginator import CDPagination as _CDPagination
 from aiogram.filters.callback_data import CallbackData
+from pydantic import Field
+
+from app.utils.time import datetime_now
 
 
 class CDMenu(CallbackData, prefix="menu"):
@@ -28,3 +31,7 @@ class CDReferralProgram(CallbackData, prefix="referral_program"):
 
 class CDPagination(_CDPagination, prefix="pt"):
     pass
+
+
+class CDRefresh(CallbackData, prefix="r"):
+    timestamp: float = Field(default_factory=lambda: datetime_now().timestamp())

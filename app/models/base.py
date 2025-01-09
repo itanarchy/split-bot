@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, Self
 
+from aiogram.fsm.context import FSMContext
 from pydantic import BaseModel as _BaseModel
 from pydantic import ConfigDict, PrivateAttr
 
@@ -19,3 +20,11 @@ class PydanticModel(_BaseModel):
     def __setattr__(self, name: str, value: Any) -> None:
         super().__setattr__(name, value)
         self.__updated[name] = value
+
+    @classmethod
+    async def from_state(cls, state: FSMContext) -> Self:
+        # noinspection PyArgumentList
+        return cls(**await state.get_data())
+
+    async def update_state(self, state: FSMContext) -> None:
+        await state.update_data(self.model_dump())

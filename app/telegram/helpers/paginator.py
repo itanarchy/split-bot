@@ -5,7 +5,7 @@ from aiogram_i18n import I18nContext
 from aiogram_i18n.types import InlineKeyboardButton
 
 from app.enums import PaginationMenuType
-from app.models.dto.ton import TonWallet
+from app.models.dto import TonWallet
 
 from ..keyboards.callback_data.menu import CDMenu
 from ..keyboards.callback_data.ton_connect import CDChooseWallet

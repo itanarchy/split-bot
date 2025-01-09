@@ -19,3 +19,13 @@ class SGBuyStars(StatesGroup):
     enter_count = State()
     # select_currency = State()
     confirm = State()
+
+
+class SGCreateGiftCode(StatesGroup):
+    waiting = State()
+    amount = State()
+    activations = State()
+
+
+class SGUseGiftCode(StatesGroup):
+    username = State()

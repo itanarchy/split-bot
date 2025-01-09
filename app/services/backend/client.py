@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Literal, Optional
 
 from stollen import Stollen
+from stollen.requests import Header
 
 from .errors import (
     SplitAPIError,
@@ -16,6 +17,7 @@ from .errors import (
 
 if TYPE_CHECKING:
     from .types import (
+        NewGiftCode,
         Recipient,
         TonProof,
         Transaction,
@@ -24,11 +26,20 @@ if TYPE_CHECKING:
 
 
 class Backend(Stollen):
-    def __init__(self, *, base_url: str, **stollen_kwargs: Any) -> None:
+    access_token: Optional[str] = None
+
+    def __init__(
+        self,
+        *,
+        base_url: str,
+        access_token: Optional[str] = None,
+        **stollen_kwargs: Any,
+    ) -> None:
+        self.access_token = access_token
         super().__init__(
             base_url=base_url,
-            response_data_key=["message"],
             error_message_key=["error_message"],
+            global_request_fields=[self.get_access_token_header],
             general_error_class=SplitAPIError,
             error_codes={
                 400: SplitBadRequestError,
@@ -41,16 +52,13 @@ class Backend(Stollen):
             **stollen_kwargs,
         )
 
-    async def buy_premium(
-        self,
-        access_token: str,
-        recipient: str,
-        months: int,
-    ) -> Transaction:
+    def get_access_token_header(self, *_: Any) -> Header:
+        return Header(name="Authorization", value=f"Bearer {self.access_token}")
+
+    async def buy_premium(self, recipient: str, months: int) -> Transaction:
         from .methods import BuyPremium
 
         call: BuyPremium = BuyPremium(
-            access_token=access_token,
             recipient=recipient,
             months=months,
         )
@@ -59,24 +67,19 @@ class Backend(Stollen):
 
     async def buy_stars(
         self,
-        access_token: str,
         recipient: str,
         quantity: int,
     ) -> Transaction:
         from .methods import BuyStars
 
-        call: BuyStars = BuyStars(
-            access_token=access_token,
-            recipient=recipient,
-            quantity=quantity,
-        )
+        call: BuyStars = BuyStars(recipient=recipient, quantity=quantity)
 
         return await self(call)
 
     async def check_ton_proof(
         self,
         address: str,
-        network: str,
+        network: Literal["-3", "-239"],
         public_key: str,
         proof: TonProof,
     ) -> str:
@@ -91,10 +94,27 @@ class Backend(Stollen):
 
         return await self(call)
 
-    async def create_user(self, access_token: str, inviter: Optional[str] = None) -> User:
+    async def create_gift_code(
+        self,
+        *,
+        seed: Optional[str] = None,
+        max_activations: int,
+        max_buy_amount: float,
+    ) -> NewGiftCode:
+        from .methods import CreateGiftCode
+
+        call: CreateGiftCode = CreateGiftCode(
+            seed=seed,
+            max_activations=max_activations,
+            max_buy_amount=max_buy_amount,
+        )
+
+        return await self(call)
+
+    async def create_user(self, inviter: Optional[str] = None) -> User:
         from .methods import CreateUser
 
-        call: CreateUser = CreateUser(access_token=access_token, inviter=inviter)
+        call: CreateUser = CreateUser(inviter=inviter)
 
         return await self(call)
 
@@ -105,29 +125,57 @@ class Backend(Stollen):
 
         return await self(call)
 
-    async def get_me(self, access_token: str) -> User:
+    async def get_buy_fee(self) -> float:
+        from .methods import GetBuyFee
+
+        call: GetBuyFee = GetBuyFee()
+
+        return await self(call)
+
+    async def get_me(self) -> User:
         from .methods import GetMe
 
-        call: GetMe = GetMe(access_token=access_token)
+        call: GetMe = GetMe()
 
         return await self(call)
 
-    async def resolve_premium_recipient(self, access_token: str, username: str) -> Recipient:
+    async def get_ton_rate(self) -> float:
+        from .methods import GetTonRate
+
+        call: GetTonRate = GetTonRate()
+
+        return await self(call)
+
+    async def resolve_premium_recipient(self, username: str) -> Recipient:
         from .methods import ResolvePremiumRecipient
 
-        call: ResolvePremiumRecipient = ResolvePremiumRecipient(
-            access_token=access_token,
-            username=username,
-        )
+        call: ResolvePremiumRecipient = ResolvePremiumRecipient(username=username)
 
         return await self(call)
 
-    async def resolve_stars_recipient(self, access_token: str, username: str) -> Recipient:
+    async def resolve_stars_recipient(self, username: str) -> Recipient:
         from .methods import ResolveStarsRecipient
 
-        call: ResolveStarsRecipient = ResolveStarsRecipient(
-            access_token=access_token,
-            username=username,
+        call: ResolveStarsRecipient = ResolveStarsRecipient(username=username)
+
+        return await self(call)
+
+    async def use_gift_code(
+        self,
+        seed: str,
+        amount: float,
+        recipient: str,
+        gift_code_address: str,
+        owner_address: str,
+    ) -> Transaction:
+        from .methods import UseGiftCode
+
+        call: UseGiftCode = UseGiftCode(
+            seed=seed,
+            amount=amount,
+            recipient=recipient,
+            gift_code_address=gift_code_address,
+            owner_address=owner_address,
         )
 
         return await self(call)

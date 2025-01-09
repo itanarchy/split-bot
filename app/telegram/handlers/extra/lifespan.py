@@ -5,7 +5,7 @@ from typing import Final
 from aiogram import Bot, Router
 from aiogram.types import BotCommand
 
-from app.services.backend import Backend
+from app.services.backend.session import BackendSession
 
 router: Final[Router] = Router(name=__name__)
 
@@ -16,6 +16,6 @@ async def set_bot_commands(bot: Bot) -> None:
 
 
 @router.shutdown()
-async def on_shutdown(bot: Bot, backend: Backend) -> None:
+async def on_shutdown(bot: Bot, backend_session: BackendSession) -> None:
     await bot.session.close()
-    await backend.session.close()
+    await backend_session.close()

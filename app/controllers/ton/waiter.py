@@ -3,7 +3,7 @@ import asyncio
 from pytonconnect import TonConnect
 
 from app.controllers.ton.proof import verify_ton_proof
-from app.models.dto.ton import TonConnectResult
+from app.models.dto import TonConnectResult
 from app.services.backend import Backend
 from app.services.ton_connect import TcAdapter
 from app.utils.ton import convert_address
