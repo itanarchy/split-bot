@@ -9,6 +9,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, TelegramObject
 from aiogram.types import User as AiogramUser
 from aiogram_i18n import I18nContext
+from aiohttp import ClientResponseError
 from pytonconnect.exceptions import UserRejectsError
 from tonutils.client import ToncenterClient
 
@@ -60,10 +61,21 @@ async def search_gift_code(
             user=user,
         )
 
-    giftcode_data: FullGiftCodeData = await get_giftcode_data(
-        address=deep_link.gift_code_address,
-        toncenter=toncenter,
-    )
+    try:
+        giftcode_data: FullGiftCodeData = await get_giftcode_data(
+            address=deep_link.gift_code_address,
+            toncenter=toncenter,
+        )
+    except ClientResponseError as error:
+        if error.code == 401:
+            return await show_main_menu(
+                _=_,
+                helper=helper,
+                i18n=i18n,
+                state=state,
+                user=user,
+            )
+        raise
 
     if giftcode_data.activations_left <= 0:
         return await helper.answer(

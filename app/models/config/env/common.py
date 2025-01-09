@@ -9,4 +9,4 @@ class CommonConfig(EnvSettings, env_prefix="COMMON_"):
     users_cache_time: int = 30
     deep_links_cache_time: int = 300
     ton_connect_cache_time: int = 30
-    ton_center_key: SecretStr
+    ton_center_key: SecretStr = SecretStr("")
