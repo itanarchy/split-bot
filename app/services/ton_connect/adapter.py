@@ -16,6 +16,7 @@ from .storage import TcStorage
 
 class TcAdapter:
     manifest_url: str
+    bridge_key: str
     storage: TcStorage
     connector: TonConnect
 
@@ -26,15 +27,21 @@ class TcAdapter:
         session_pool: async_sessionmaker[AsyncSession],
         redis: RedisRepository,
         cache_time: int,
+        bridge_key: str,
     ) -> None:
         self.manifest_url = manifest_url
+        self.bridge_key = bridge_key
         self.storage = TcStorage(
             telegram_id=telegram_id,
             session_pool=session_pool,
             redis=redis,
             cache_time=cache_time,
         )
-        self.connector = TonConnect(manifest_url=manifest_url, storage=self.storage)
+        self.connector = TonConnect(
+            manifest_url=manifest_url,
+            storage=self.storage,
+            api_tokens={"tonapi": bridge_key},
+        )
 
     def copy(self, telegram_id: int) -> TcAdapter:
         return TcAdapter(
@@ -43,6 +50,7 @@ class TcAdapter:
             session_pool=self.storage.session_pool,
             redis=self.storage.redis,
             cache_time=self.storage.cache_time,
+            bridge_key=self.bridge_key,
         )
 
     async def is_connected(self) -> bool:

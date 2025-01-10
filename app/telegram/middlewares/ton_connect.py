@@ -27,6 +27,7 @@ class TonConnectMiddleware(EventTypedMiddleware):
         config: AppConfig = data["config"]
         data["ton_connect"] = adapter = TcAdapter(
             manifest_url=assets.ton_connect.manifest_url,
+            bridge_key=config.common.ton_api_bridge_key.get_secret_value(),
             telegram_id=user.telegram_id,
             session_pool=data["session_pool"],
             redis=data["redis"],
