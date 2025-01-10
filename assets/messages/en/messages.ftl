@@ -15,7 +15,7 @@ messages-connection_timeout = ⏳ Connection expired
 messages-something_went_wrong = Oops! Something went wrong...
 messages-language = 🌎 Select your preferred language by clicking button below:
 
-extra-language = 🇬🇧 🇬English
+extra-language = 🇬🇧 English
 extra-selectable = { $selected ->
     [true] [ {$value} ]
     *[other] { $value }
