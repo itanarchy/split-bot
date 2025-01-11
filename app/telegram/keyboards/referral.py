@@ -21,3 +21,9 @@ def join_bot_keyboard(i18n: I18nContext, url: str) -> InlineKeyboardMarkup:
     builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
     builder.button(text=i18n.buttons.join_bot(), url=url)
     return builder.as_markup()
+
+
+def share_keyboard(i18n: I18nContext, deep_link_id: str) -> InlineKeyboardMarkup:
+    builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    builder.button(text=i18n.buttons.share(), switch_inline_query=deep_link_id)
+    return builder.as_markup()

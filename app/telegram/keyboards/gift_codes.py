@@ -3,7 +3,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram_i18n import I18nContext
 
 from app.enums import GiftCodeCreationStatus
-
 from .callback_data.gift_codes import (
     CDConfirmGiftCode,
     CDSetGiftCodeActivations,
@@ -13,7 +12,8 @@ from .callback_data.menu import CDMenu
 
 
 def gift_code_creation_keyboard(
-    i18n: I18nContext, status: GiftCodeCreationStatus
+    i18n: I18nContext,
+    status: GiftCodeCreationStatus,
 ) -> InlineKeyboardMarkup:
     builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
     sizes: list[int] = [2, 1]
@@ -30,4 +30,10 @@ def gift_code_creation_keyboard(
     )
     builder.button(text=i18n.buttons.back(), callback_data=CDMenu())
     builder.adjust(*sizes)
+    return builder.as_markup()
+
+
+def claim_gift_code_keyboard(i18n: I18nContext, url: str) -> InlineKeyboardMarkup:
+    builder: InlineKeyboardBuilder = InlineKeyboardBuilder()
+    builder.button(text=i18n.buttons.claim_gift_code(), url=url)
     return builder.as_markup()

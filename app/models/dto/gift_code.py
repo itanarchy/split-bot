@@ -45,6 +45,14 @@ class FullGiftCodeData(PydanticModel):
     def activations_left(self) -> int:
         return self.max_activations - self.total_activations
 
+    @property
+    def fully_activated(self) -> bool:
+        return self.activations_left <= 0
+
+    @property
+    def total_amount(self) -> float:
+        return self.max_buy_amount * self.max_activations
+
 
 class GiftCodeActivation(PydanticModel):
     link_id: UUID

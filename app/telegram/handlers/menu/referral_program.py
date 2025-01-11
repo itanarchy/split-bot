@@ -10,12 +10,12 @@ from aiogram.types import (
     TelegramObject,
 )
 from aiogram.utils.deep_linking import create_start_link
-from aiogram.utils.link import create_telegram_link
 from aiogram_i18n import I18nContext
 
 from app.telegram.keyboards.callback_data.menu import CDReferralProgram
 from app.telegram.keyboards.menu import menu_keyboard
-from app.telegram.keyboards.referral import join_bot_keyboard, referral_program_keyboard
+from app.telegram.keyboards.referral import referral_program_keyboard
+from app.telegram.results.inline_query import not_found_answer
 
 if TYPE_CHECKING:
     from app.models.dto import DeepLinkDto, UserDto
@@ -68,14 +68,11 @@ async def show_inline_query_menu(
             )
         )
     else:
-        url = create_telegram_link((await bot.me()).username)
         results.append(
-            InlineQueryResultArticle(
-                id="null",
+            await not_found_answer(
                 title=i18n.messages.wallet_not_connected(),
-                input_message_content=InputTextMessageContent(message_text=r"¯\_(ツ)_/¯"),
-                reply_markup=join_bot_keyboard(i18n=i18n, url=url),
+                i18n=i18n,
+                bot=bot,
             )
         )
-
     return await query.answer(results=results, cache_time=0)  # type: ignore

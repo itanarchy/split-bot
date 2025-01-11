@@ -35,6 +35,7 @@ messages-gift_codes-created =
     <blockquote>⚠️ Please make sure that you have confirmed transaction before using gift code.</blockquote>
 
 messages-gift_codes-expired = 🎁 Gift code expired
+messages-gift_codes-not_found = 🎁 Gift code not found
 
 messages-gift_codes-view =
     <b>🎁 Gift code for { $max_buy_amount } TON</b>
@@ -45,3 +46,12 @@ messages-gift_codes-view =
 
 messages-gift_codes-use_requested =
     👛 A transaction to receive stars for username @{ $username } has been requested from your wallet
+
+messages-gift_codes-shared =
+    🎁 Gift code for { $total_amount } TON in stars
+
+    Claim amount: { $amount } TON
+    Activations left: { $activations_left } of { $max_activations }
+
+buttons-share_gift_code = 🎁 Share Gift Code
+buttons-claim_gift_code = Claim Stars

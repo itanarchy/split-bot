@@ -19,6 +19,7 @@ from app.telegram.filters.states import SGCreateGiftCode
 from app.telegram.handlers.menu.gift_codes.start_creation import show_gift_code_creation
 from app.telegram.keyboards.callback_data.gift_codes import CDConfirmGiftCode
 from app.telegram.keyboards.menu import to_menu_keyboard
+from app.telegram.keyboards.referral import share_keyboard
 
 if TYPE_CHECKING:
     from app.models.config import Assets
@@ -70,6 +71,7 @@ async def create_gift_code(
     url: str = await create_start_link(bot=bot, payload=deep_link.id.hex)
     await helper.answer(
         text=i18n.messages.gift_codes.created(link=url),
+        reply_markup=share_keyboard(i18n=i18n, deep_link_id=deep_link.id.hex),
         edit=False,
         delete=False,
     )
