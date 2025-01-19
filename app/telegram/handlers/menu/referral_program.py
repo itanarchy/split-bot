@@ -18,8 +18,7 @@ from app.telegram.keyboards.referral import referral_program_keyboard
 from app.telegram.results.inline_query import not_found_answer
 
 if TYPE_CHECKING:
-    from app.models.dto import DeepLinkDto, UserDto
-    from app.services.deep_links import DeepLinksService
+    from app.models.dto import UserDto
     from app.telegram.helpers.messages import MessageHelper
 
 router: Final[Router] = Router(name=__name__)
@@ -32,15 +31,13 @@ async def show_referral_link(
     i18n: I18nContext,
     bot: Bot,
     user: UserDto,
-    deep_links: DeepLinksService,
 ) -> Any:
     if user.wallet_address is None:
         return await helper.answer(
             text=i18n.messages.wallet_not_connected(),
             reply_markup=menu_keyboard(i18n=i18n, wallet_connected=user.wallet_connected),
         )
-    deep_link: DeepLinkDto = await deep_links.get_invite_link(owner_id=user.id)
-    url: str = await create_start_link(bot=bot, payload=deep_link.id.hex)
+    url: str = await create_start_link(bot=bot, payload=user.wallet_address)
     return await helper.answer(
         text=i18n.messages.referral.info(link=url),
         reply_markup=referral_program_keyboard(i18n=i18n, url=url),
@@ -53,16 +50,14 @@ async def show_inline_query_menu(
     i18n: I18nContext,
     bot: Bot,
     user: UserDto,
-    deep_links: DeepLinksService,
 ) -> Any:
     results: list[InlineQueryResultArticle] = []
     if user.wallet_connected:
-        deep_link: DeepLinkDto = await deep_links.get_invite_link(owner_id=user.id)
-        url: str = await create_start_link(bot=bot, payload=deep_link.id.hex)
+        url: str = await create_start_link(bot=bot, payload=user.wallet_address)
         invite_text: str = i18n.messages.referral.invite(link=url)
         results.append(
             InlineQueryResultArticle(
-                id=deep_link.id.hex,
+                id=user.wallet_address,
                 title=i18n.buttons.share(),
                 input_message_content=InputTextMessageContent(message_text=invite_text),
             )

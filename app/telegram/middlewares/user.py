@@ -39,8 +39,12 @@ class UserMiddleware(EventTypedMiddleware):
         if not isinstance(event, Message) or event.text is None:
             return None
 
+        with suppress(CommandException):
+            command: CommandObject = await self.address_filter.parse_command(event.text, bot)
+            return command.magic_result
+
         with suppress(CommandException, ValueError):
-            command: CommandObject = await self.deep_links_filter.parse_command(event.text, bot)
+            command = await self.deep_links_filter.parse_command(event.text, bot)
             if not isinstance(command.magic_result, UUID):
                 raise ValueError()
             deep_link: Optional[DeepLinkDto] = await deep_links.get(link_id=command.magic_result)
@@ -51,11 +55,7 @@ class UserMiddleware(EventTypedMiddleware):
                 raise ValueError()
             return owner.wallet_address
 
-        try:
-            command = await self.address_filter.parse_command(event.text, bot)
-            return command.magic_result
-        except CommandException:
-            return None
+        return None
 
     async def __call__(
         self,

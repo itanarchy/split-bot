@@ -3,6 +3,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram_i18n import I18nContext
 
 from app.enums import GiftCodeCreationStatus
+
 from .callback_data.gift_codes import (
     CDConfirmGiftCode,
     CDSetGiftCodeActivations,
