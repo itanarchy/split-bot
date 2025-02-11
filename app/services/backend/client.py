@@ -55,12 +55,18 @@ class Backend(Stollen):
     def get_access_token_header(self, *_: Any) -> Header:
         return Header(name="Authorization", value=f"Bearer {self.access_token}")
 
-    async def buy_premium(self, recipient: str, months: int) -> Transaction:
+    async def buy_premium(
+        self,
+        recipient: str,
+        months: int,
+        username: str,
+    ) -> Transaction:
         from .methods import BuyPremium
 
         call: BuyPremium = BuyPremium(
             recipient=recipient,
             months=months,
+            username=username,
         )
 
         return await self(call)
@@ -69,10 +75,15 @@ class Backend(Stollen):
         self,
         recipient: str,
         quantity: int,
+        username: str,
     ) -> Transaction:
         from .methods import BuyStars
 
-        call: BuyStars = BuyStars(recipient=recipient, quantity=quantity)
+        call: BuyStars = BuyStars(
+            recipient=recipient,
+            quantity=quantity,
+            username=username,
+        )
 
         return await self(call)
 

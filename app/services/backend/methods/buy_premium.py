@@ -26,3 +26,4 @@ class BuyPremium(
         ),
     )
     months: int = Field(description="Subscription duration in months")
+    username: str = Field(description="Recipient's username")

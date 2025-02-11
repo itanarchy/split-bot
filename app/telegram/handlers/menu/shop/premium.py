@@ -125,6 +125,7 @@ async def buy_premium(
     transaction: Transaction = await backend.buy_premium(
         recipient=data["recipient"],
         months=data["period"],
+        username=data["username"],
     )
     await state.clear()
     await helper.answer(

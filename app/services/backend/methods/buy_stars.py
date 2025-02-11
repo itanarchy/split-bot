@@ -26,3 +26,4 @@ class BuyStars(
         ),
     )
     quantity: int = Field(description="How much stars to buy")
+    username: str = Field(description="Recipient's username")

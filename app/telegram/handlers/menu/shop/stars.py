@@ -112,6 +112,7 @@ async def buy_stars(
     transaction: Transaction = await backend.buy_stars(
         recipient=data["recipient"],
         quantity=data["quantity"],
+        username=data["username"],
     )
     await state.clear()
     await helper.answer(
